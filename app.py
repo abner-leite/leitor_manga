@@ -11,26 +11,31 @@ if 'page' not in st.session_state:
 
 if 'capitulo' not in st.session_state:
     st.session_state.capitulo = 1
+    st.session_state.capitulo_antigo = 1
 
 if 'extension' not in st.session_state:
     st.session_state.extension="png"
 
 if "manga" not in st.session_state:
     st.session_state.manga = "None"
-    st.session_state.manta_antigo = "None"
+    st.session_state.manga_antigo = "None"
 
 
 
 st.session_state.manga =st.selectbox("Qual manga vai ler?",("None","Boku no Hero","Jujutsu Kaisen"))
-if st.session_state.manga != st.session_state.manta_antigo :
+if st.session_state.manga != st.session_state.manga_antigo :
     st.session_state.page = 1
-    st.session_state.manta_antigo  = st.session_state.manga
+    st.session_state.manga_antigo  = st.session_state.manga
 
 if st.session_state.manga == "Boku no Hero":
     url_base = "https://img.lermanga.org/B/boku-no-hero-academia/capitulo-"
     
     try:
         st.session_state.capitulo = int(st.text_input("Digite o numero do capitulo"))
+        if st.session_state.capitulo != st.session_state.capitulo_antigo :
+            st.session_state.page = 1
+            st.session_state.capitulo_antigo  = st.session_state.capitulo
+            
         if st.session_state.capitulo <=10:
             st.session_state.start_capitulo = "0"
         else:
@@ -52,14 +57,11 @@ elif st.session_state.manga == "Jujutsu Kaisen":
     
 
 def render_image():
-    st.write(f"Extensão:{st.session_state.extension}" )
     st.write(f"Capitulo {st.session_state.capitulo}")
     st.write(f"Pagina {st.session_state.page}")
     try:
-        print({st.session_state.start_capitulo})
         url = f"{url_base}{st.session_state.start_capitulo}{st.session_state.capitulo}/{st.session_state.start_page}{st.session_state.page}.{st.session_state.extension}"
         print(url)
-        print( st.session_state.start_page,st.session_state.extension)
         response = requests.get(url)
         print("response",response.status_code)
         if response.status_code == 200:
@@ -67,7 +69,6 @@ def render_image():
         
         else:
             trocar_type_start_page()
-            print( st.session_state.start_page,st.session_state.extension)
             url = f"{url_base}{st.session_state.start_capitulo}{st.session_state.capitulo}/{st.session_state.start_page}{st.session_state.page}.{st.session_state.extension}"
             print(url)
             response = requests.get(url)
@@ -78,7 +79,6 @@ def render_image():
 
             else:
                 trocar_extension()
-                print( st.session_state.start_page,st.session_state.extension)
                 url = f"{url_base}{st.session_state.start_capitulo}{st.session_state.capitulo}/{st.session_state.start_page}{st.session_state.page}.{st.session_state.extension}"
                 print(url)
                 response = requests.get(url)
@@ -87,7 +87,6 @@ def render_image():
                     st.image(BytesIO(response.content))
                 else:
                     trocar_type_start_page()
-                    print( st.session_state.start_page,st.session_state.extension)
                     url = f"{url_base}{st.session_state.start_capitulo}{st.session_state.capitulo}/{st.session_state.start_page}{st.session_state.page}.{st.session_state.extension}"
                     print(url)
                     response = requests.get(url)
